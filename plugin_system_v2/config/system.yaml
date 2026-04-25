@@ -1,0 +1,62 @@
+# 系统配置文件
+
+# API 配置
+api:
+  host: "0.0.0.0"
+  port: 8080
+
+# 指标配置
+metrics:
+  port: 9090
+  enabled: true
+
+# 插件配置
+plugins:
+  # 插件目录
+  directories:
+    - "plugins/builtin"
+    - "plugins/external"
+
+  # 全局配置
+  global:
+    max_concurrent: 10
+    default_timeout: 30
+    enable_metrics: true
+    enable_tracing: true
+
+  # 插件特定配置
+  echo_plugin:
+    enabled: true
+    timeout: 10
+    config:
+      prefix: "[ECHO]"
+
+  sum_plugin:
+    enabled: true
+    timeout: 30
+    config:
+      max_numbers: 1000
+
+  validator_plugin:
+    enabled: true
+    timeout: 10
+    config:
+      required_fields: []
+
+# 资源限制
+resources:
+  default:
+    max_memory_mb: 512
+    max_cpu_percent: 50
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "json"
+  output: "stdout"
+
+# 熔断配置
+circuit_breaker:
+  failure_threshold: 5
+  timeout: 60
+  half_open_timeout: 30

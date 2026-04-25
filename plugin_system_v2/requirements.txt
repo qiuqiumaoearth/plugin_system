@@ -1,0 +1,39 @@
+# 核心依赖
+pyyaml>=6.0
+packaging>=21.0
+
+# 异步支持
+asyncio>=3.4.3
+aiohttp>=3.8.0
+
+# 并发
+concurrent-futures>=3.1.1
+
+# 可观测性
+prometheus-client>=0.16.0
+opentelemetry-api>=1.15.0
+opentelemetry-sdk>=1.15.0
+
+# 资源监控
+psutil>=5.9.0
+
+# HTTP 服务器
+flask>=2.3.0
+flask-cors>=4.0.0
+
+# gRPC（可选）
+grpcio>=1.50.0
+grpcio-tools>=1.50.0
+
+# 数据验证
+jsonschema>=4.17.0
+
+# 测试
+pytest>=7.2.0
+pytest-asyncio>=0.20.0
+pytest-cov>=4.0.0
+
+# 代码质量
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
