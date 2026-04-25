@@ -135,6 +135,75 @@ class PluginExecutor:
             "error": error
         }
 
+    def execute_all(self,
+                    data: Dict[str, Any],
+                    context: PluginContext,
+                    mode: str = "sequential") -> Dict[str, Any]:
+        """
+        批量执行所有已启用的插件
+
+        Args:
+            data: 输入数据
+            context: 执行上下文
+            mode: 执行模式 - "sequential"(顺序) 或 "parallel"(并行)
+
+        Returns:
+            包含所有插件执行结果的字典
+        """
+        enabled_plugins = self.registry.list_enabled()
+
+        if not enabled_plugins:
+            return {
+                "success": True,
+                "total": 0,
+                "results": {},
+                "errors": {}
+            }
+
+        results = {}
+        errors = {}
+
+        if mode == "sequential":
+            # 顺序执行
+            for plugin_name in enabled_plugins:
+                result = self.execute(plugin_name, data, context)
+                if result["success"]:
+                    results[plugin_name] = result["result"]
+                else:
+                    errors[plugin_name] = result["error"]
+
+        elif mode == "parallel":
+            # 并行执行
+            futures = {}
+            for plugin_name in enabled_plugins:
+                future = self.thread_pool.submit(
+                    self.execute, plugin_name, data, context
+                )
+                futures[plugin_name] = future
+
+            # 收集结果
+            for plugin_name, future in futures.items():
+                try:
+                    result = future.result(timeout=30)  # 30秒超时
+                    if result["success"]:
+                        results[plugin_name] = result["result"]
+                    else:
+                        errors[plugin_name] = result["error"]
+                except Exception as e:
+                    errors[plugin_name] = str(e)
+
+        else:
+            raise ValueError(f"Invalid mode: {mode}. Use 'sequential' or 'parallel'")
+
+        return {
+            "success": len(errors) == 0,
+            "total": len(enabled_plugins),
+            "successful": len(results),
+            "failed": len(errors),
+            "results": results,
+            "errors": errors
+        }
+
     def shutdown(self):
         """关闭执行器"""
         self.thread_pool.shutdown(wait=True)
